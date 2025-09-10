@@ -1,0 +1,35 @@
+# Let G be an adjacency matrix and s the starting vertex.
+# We assume all edges have a weight != 0. This is simply to allow us to
+# conclude that 0's in the adjacency matrix signify a missing edge.
+cost = 0
+visited = zeros(Int, G.num_nodes());
+s = SRC_NODE_OF_SMALLEST_EDGE
+
+Iterate(frontier)
+    Start-With
+        i = s; 
+        frontier = zeros(Int, G.num_nodes()); 
+    end
+
+    Process
+        frontier{t+1}[j] = visited[j] * (frontier{t}[i] + G[i,j])
+    end
+
+    # Runs for each t, at the end of processing all j's
+    Post-Process
+        # Returns the minimum value in the frontier. Will not return 0.
+        min_cost, min_cost_neighbor = MIN_OVER_I(frontier{t+1}) 
+        cost += min_cost
+        
+        FLUSH(frontier{t+1})
+        frontier{t+1}[min_cost_neighbor] = 1
+        visited[min_cost_neighbor] = 1
+    end
+    
+    Stop-When f[] = 0
+
+# -------
+# INFERENCES
+#
+# This is another case where edges need to be processed. But this also
+# dependends on obtaining the maximum value inside a frontier at a given timestep

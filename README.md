@@ -20,7 +20,8 @@ A more detailed description of the specification is as follows
 ```
 // Code block that is to be compiled by GLAM. The frontier token is used 
 // to identify the nodes in graph that need to be processed in a single iteration
-Graph-Iterate(frontier)
+// The t token is used throughout the block uniquely identify a single iteration.
+Graph-Iterate{t}(frontier)
 
     // SUBBLOCK #1: Single iteration definition
     // This subblock is executed repeatedly till the stopping condition is met.
@@ -28,20 +29,18 @@ Graph-Iterate(frontier)
     // A single execution of this subblock executes Process for i = 1..NUM_NODES
     // and then executes the contents of Post-Process.
     //
-    // Few variables have special meaning in the context of this subblock:
-    //      i -> the index of the current node for which the block is being processed
-    //      j -> any value from 1..NUM_NODES, used to index the destination node for an i - j edge
-    //      t -> the index of the current iteration, used to index the current and next frontier
-    //
     // NOTES
-    // 1. i and j can only be used in the Process section and not the Post-Process section.
+    // 1. The Process block allows us to use an index (`i` in this case) to reference the current vertex
+    //    being processed.
     // 2. The Post-Process section can be ignored if it doesn't serve a purpose in the algorithm.
-    // 3. During the execution for a single frontier element, code referencing j, is 
-    //    processed for all values of j from 1..NUM_NODES.
+    // 3. During the execution of this subblock, we may occasionally need to reference a secondary index
+    //    to give us nested loop like functionality. This achieved through the iterator definition syntax
+    //    i.e. ..[{var1, LIMIT}] = ...var1... The variable token within the curly braces of the LHS define 
+    //    the secondary iterator. It can take on values from 1..LIMIT  
     // 4. At each iteration, the frontier for the next iteration (i.e. frontier{t+1}) is initialized 
     //    as an array of zeros. Its expected that the processing of frontier{t} populates frontier{t+1}.
-    Process
-        frontier{t+1}[j] = frontier{t}[i] * G[i,j]
+    Process(i : frontier)
+        frontier{t+1}[{j,N}] = frontier{t}[i] * G[i,j]
     Post-Process
         cost += AGG(frontier{t+1})
     end

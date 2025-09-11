@@ -1,5 +1,5 @@
 # ----------------------------------------------------------------------
-# ALGORITHM: STANDARD KRUSHKAL
+# ALGORITHM: STANDARD KRUSKAL
 # ASSUMED INPUTS:
 #    1. Adjacency Matrix (G)
 #    2. Index of the source node with the smallest index (s)

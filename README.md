@@ -25,8 +25,8 @@ Graph-Iterate(frontier)
     // SUBBLOCK #1: Single iteration definition
     // This subblock is executed repeatedly till the stopping condition is met.
     // The subblock contains two sections within it, namely Process and Post-Process
-    // A single execution of this subblock executes Process for all non-zero values 
-    // in the frontier and then executes the contents of Post-Process.
+    // A single execution of this subblock executes Process for i = 1..NUM_NODES
+    // and then executes the contents of Post-Process.
     //
     // Few variables have special meaning in the context of this subblock:
     //      i -> the index of the current node for which the block is being processed

@@ -3,31 +3,36 @@
 # ASSUMED INPUTS:
 #    1. Adjacency Matrix (G)
 #    2. Starting node index (s)
+#    3. Number of vertices (N)
 #
 # COMMENTS
 # ----------------------------------------------------------------------
 
 result = [];
-frontier = zeros(Int, G.num_nodes()); 
+frontier = zeros(Int, N); 
 frontier[s] = 1;
 do_push = true
 
-Graph-Iterate(frontier)
-    Process()
+Graph-Iterate{t}(frontier)
+    Process(i : frontier)
         if do_push
             # Push
-            frontier{t+1}[j] = frontier{t}[i] * G[i,j]
+            frontier{t+1}[{j,N}] = frontier{t}[i] * G[i,j]
+            result += i
+            MASK_NODE(i)
         else
             # Pull
-            # TODO: We need to add early exit
-            frontier{t+1}[i] = frontier{t}[j] * G[j,i]
-        end
+            frontier{t+1}[i] = ITER_TILL_FIRST_NON_ZERO{j,N}(frontier{t}[j] * G[j,i])
 
-        result += i
-        MASK_NODE(i)
+            if frontier{t+1}[i] > 0
+                result += i
+                MASK_NODE(i)
+            end
+        end
+ 
     Post-Process
-        n_over_beta1 = G.num_nodes() / 8.0;
-        n_over_beta2 = G.num_nodes() / 512.0;
+        n_over_beta1 = N / 8.0
+        n_over_beta2 = N / 512.0
 
         frontier_size_t = sum(frontier{t})
         frontier_size_t_1 = sum(frontier{t+1})

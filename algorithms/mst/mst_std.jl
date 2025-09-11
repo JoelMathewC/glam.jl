@@ -25,7 +25,7 @@ Graph-Iterate(frontier)
         cost += min_cost
         MASK_NODE(min_cost_neighbor)
         
-        FLUSH(frontier{t+1})
+        frontier{t+1} .= 0
         frontier{t+1}[min_cost_neighbor] = 1
     end
     

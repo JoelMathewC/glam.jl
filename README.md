@@ -54,5 +54,5 @@ Graph-Iterate(frontier)
 ### Helper functions for the Process/Post-Process sections
 | Function Name | Purpose |
 |-|-|
-| MASK_NODE(node_idx) | Indicates that a node should not be processed in future iterations if it exists in the frontier |
+| `MASK_NODE(node_idx)` | Indicates that a node should not be processed in future iterations if it exists in the frontier |
 

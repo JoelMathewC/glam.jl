@@ -4,7 +4,6 @@ function bellman_ford_einsum(adj_matrix,src)
     G = Tensor(Dense(SparseList(Element(10^8))), adj_matrix)
     (n, _) = size(G)
 
-    # result - shortest distance to all nodes
     D = Tensor(Dense(SparseList(Element(10^8))), 1, n)
     @finch D[1,src] = 0
 
@@ -30,6 +29,8 @@ adj_matrix = [
         10^8 10^8 0
     ]
 
+print(bellman_ford_einsum(adj_matrix,1))
+
 # Negative Cycle case
 # adj_matrix = [   
 #         0    10^8  1; 
@@ -45,6 +46,3 @@ adj_matrix = [
 #         10^8 10^8 10^8 10^8 0    2;
 #         10^8 10^8 10^8 2    10^8 0;
 #     ]
-
-
-print(bellman_ford_einsum(adj_matrix,1))

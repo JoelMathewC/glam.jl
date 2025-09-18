@@ -14,17 +14,21 @@ function prims_einsum(adj_matrix,src)
     # Declare the starting state of the frontier
     frontier = Tensor(Dense(SparseList(Element(0))), 1, n)
     @finch frontier[1,src] = 1
+    @finch pending[1,src] = 10^8
 
     fnz_count = Scalar(1)
 
     # Loop till the frontier is no longer empty
     for t in 1:n
-        @einsum c[] <<minby>>= frontier[k,i] * G[i,j] * pending[k,j] => (i,j)
-        @finch mst[c[][0],c[][1]] = 1
-        @finch pending[1,c[][1]] = 10^8
+        @einsum c[k,i] <<minby>>= ((frontier[k,i] * G[i,j] * pending[k,j]) => (i,j))
+        
+        (edge_src, edge_dst) = c[1,src][2]
+        @finch mst[edge_src,edge_dst] = 1
+        @finch pending[1,edge_dst] = 10^8
 
         frontier = Tensor(Dense(SparseList(Element(0))), 1, n)
-        @finch frontier[1,c[][1]] = 1
+        @finch frontier[1,edge_dst] = 1
+        src = edge_dst
     end
 
     return mst

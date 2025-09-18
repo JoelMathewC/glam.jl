@@ -42,7 +42,6 @@ function bfs_einsum(adj_matrix,src)
 end
 
 
-# Adjacency matrix of the graph
 adj_matrix = [   
         0 1 1; 
         0 0 0; 

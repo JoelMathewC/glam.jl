@@ -1,27 +1,20 @@
 using Finch
 
-function bellman_ford_einsum(adj_matrix,src)
+function floyd_warshall_einsum(adj_matrix,src)
     G = Tensor(Dense(SparseList(Element(10^8))), adj_matrix)
     (n, _) = size(G)
 
-    # result - shortest distance to all nodes
-    D = Tensor(Dense(SparseList(Element(10^8))), 1, n)
-    @finch D[1,src] = 0
-
-    fnz_count = Scalar(10^8 * (n-1))
-
     for t in 1:n
-        @einsum D[k,i] <<min>>= D[k,j] + G[j,i]
-        @einsum fnz_count_prime[] += D[i,j]
-
-        if t == n && (fnz_count_prime[] < fnz_count[])
-            throw("Negative cycle detected!")
-        end
-
-        fnz_count = fnz_count_prime
+        @einsum G[i,j] <<min>>= G[i,k] + G[k,j]
     end
 
-    return D
+    for t in 1:n
+        if G[t,t] < 0
+            throw("Negative cycle exists!")
+        end
+    end
+
+    return G
 end
 
 adj_matrix = [   
@@ -47,4 +40,4 @@ adj_matrix = [
 #     ]
 
 
-print(bellman_ford_einsum(adj_matrix,1))
+print(floyd_warshall_einsum(adj_matrix,1))

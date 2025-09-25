@@ -18,6 +18,7 @@ function connected_components_einsum(adj_matrix, max_iter)
         @einsum C[i,j] = C[i,j] | G[i,j]
     end
 
+    # Since graph is directed
     @einsum result[i,j] = C[i,j] & C[j,i]
     return result
 end

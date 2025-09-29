@@ -30,8 +30,9 @@ function prims_einsum(adj_matrix)
         dst = min_edge[][2]
         @finch edge_set[dst] = 10^8
 
+        d = Queue()
         @finch for i in 1:n
-            d[i] <<min>>= G[dst,i]
+            d[i] <<min_queue>>= G[dst,i]
         end
     end
 

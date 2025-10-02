@@ -1,4 +1,4 @@
-# Testing pending (clone from finch repo for the most part)
+# Compare against the one in the finch repo when done
 using Finch
 
 function bellman_ford_einsum(adj_matrix,src)
@@ -15,17 +15,16 @@ function bellman_ford_einsum(adj_matrix,src)
     any_active = Scalar(false)
 
     for t in 1:n
-        # This seems sus
-        @finch for j=_; if active_prev[j] dists[j] <<min>>= dists_prev[j] end end
+        @finch for i=_; if active_prev[i] D[i] <<min>>= D_prev[i] end end
 
         @finch begin
             active .= false
-            for j = _
-                if active_prev[j]
-                    for i = _
-                        let d = D_prev[j] + edges[i, j]
-                            D[i] <<min>>= d
-                            active[i] |= d < D_prev[i]
+            for i = _
+                if active_prev[i]
+                    for j = _
+                        let d = D_prev[i] + G[i, j]
+                            D[j] <<min>>= d
+                            active[j] |= d < D_prev[i]
                         end
                     end
                 end
@@ -41,11 +40,10 @@ function bellman_ford_einsum(adj_matrix,src)
         if !any_active[]
             break
         end
-        dists_prev, dists = dists, dists_prev
+
+        D_prev, D = D, D_prev
         active_prev, active = active, active_prev
     end
-
-    
 
     return D
 end

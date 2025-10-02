@@ -7,9 +7,9 @@ function markov_clustering_einsum(adj_matrix, e, r, conv_thres)
     # Total outgoing weight
     @einsum N_weight[j] += G[i,j]
     @einsum markov_mat[i,j] = (N_weight[j] != 0) * G[i,j] / N_weight[j]
+    @einsum _markov_mat[i,j] = markov_mat[i,j]
 
     while true
-        _markov_mat = markov_mat
         # expansion
         for _ in 1:(e-1)
             @einsum _markov_mat[i,j] += _markov_mat[i,k] * markov_mat[k,j]
@@ -28,8 +28,7 @@ function markov_clustering_einsum(adj_matrix, e, r, conv_thres)
             return _markov_mat
         end
 
-        markov_mat = _markov_mat
-
+        @einsum markov_mat[i,j] = _markov_mat[i,j]
     end
 end
 

@@ -1,7 +1,9 @@
 using Finch
 
 function bellman_ford_adv_einsum(adj_matrix,src)
-    G = Tensor(Dense(SparseList(Element(Inf))), adj_matrix)
+    # We need to transpose the matrix here since the loop ordering mandates that each node
+    # only updates when its neighbor has updated. 
+    G = Tensor(Dense(SparseList(Element(Inf))), transpose(adj_matrix))
     (n, _) = size(G)
 
     D_prev = Tensor(Dense(Element(Inf)), n)
@@ -18,12 +20,12 @@ function bellman_ford_adv_einsum(adj_matrix,src)
 
         @finch begin
             active .= false
-            for i = _
-                if active_prev[i]
-                    for j = _
-                        let d = D_prev[i] + G[i, j]
-                            D[j] <<min>>= d
-                            active[j] |= d < D_prev[i]
+            for j = _
+                if active_prev[j]
+                    for i = _
+                        let d = D_prev[j] + G[i, j]
+                            D[i] <<min>>= d
+                            active[i] |= d < D_prev[i]
                         end
                     end
                 end

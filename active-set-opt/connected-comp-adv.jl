@@ -3,10 +3,11 @@ using Finch
 function connected_components_adv_einsum(adj_matrix, max_iter)
     (n, _) = size(adj_matrix)
 
+    # We need two lists here since the computation of G at time t depends on D at time t-1
     G_prev = Tensor(Dense(SparseList(Element(false))), adj_matrix)
     G = Tensor(Dense(SparseList(Element(false))), adj_matrix)
     
-
+    # Connected Component result matrix
     C = Tensor(Dense(SparseList(Element(false))), n, n)
     @finch begin
         for i in 1:n
@@ -15,26 +16,30 @@ function connected_components_adv_einsum(adj_matrix, max_iter)
     end
     @einsum C[i,j] = C[i,j] | G[i,j]
 
-    active_prev = Tensor(SparseByteMap(Pattern()), n)
-    @einsum active_prev[i] = active_prev[i] | true
+    # We need two lists here since the computation of active at time t+1 depends on active at time t
     active = Tensor(SparseByteMap(Pattern()), n)
+    active_next = Tensor(SparseByteMap(Pattern()), n)
     any_active = Scalar(false)
 
+    @finch for i = _ 
+        active[i] = true
+    end
+
     for t in 2:max_iter
+        # TODO: This will take O(N^2), improve using active_next set
         @einsum G[i,j] = G_prev[i,j]
         
-        active = Tensor(SparseByteMap(Pattern()), n)
         @finch begin
+            active_next .= 0
             for j = _
-                for i = _
-                    if active_prev[i] || active_prev[j]
-                        for k = _
+                for k = _
+                    if active[j] || active[k]
+                        for i = _
                             let d = G_prev[i,k] * G_prev[k,j]
                                 G[i,j] |= (d != 0)
                                 C[i,j] |= (d != 0)
 
-                                active[i] |= xor(d != 0,G_prev[i,j])
-                                active[j] |= xor(d != 0,G_prev[i,j])
+                                active_next[j] |= xor(d != 0,G_prev[i,j])
                             end
                         end
                     end
@@ -45,7 +50,7 @@ function connected_components_adv_einsum(adj_matrix, max_iter)
         @finch begin
             any_active .= false
             for i = _
-                any_active[] |= active[i]
+                any_active[] |= active_next[i]
             end
         end
         if !any_active[]
@@ -53,7 +58,7 @@ function connected_components_adv_einsum(adj_matrix, max_iter)
         end
 
         G_prev, G = G, G_prev
-        active_prev, active = active, active_prev
+        active, active_next = active_next, active
     end
 
     # Since graph is directed

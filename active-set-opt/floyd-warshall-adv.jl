@@ -3,27 +3,33 @@ using Finch
 function floyd_warshall_adv_einsum(adj_matrix)
     (n, _) = size(adj_matrix)
 
+    # We need two lists here since the computation of D at time t depends on D at time t-1
     D_prev = Tensor(Dense(SparseList(Element(Inf))), adj_matrix)
     D = Tensor(Dense(SparseList(Element(Inf))), n, n)
 
-    active_prev = Tensor(SparseByteMap(Pattern()), n)
-    @einsum active_prev[i] = active_prev[i] | true
+    # We need two lists here since the computation of active at time t+1 depends on active at time t
     active = Tensor(SparseByteMap(Pattern()), n)
+    active_next = Tensor(SparseByteMap(Pattern()), n)
     any_active = Scalar(false)
 
+    # Start with all vertices being active_next
+    @finch for i = _ 
+        active[i] = true
+    end
+
     for t in 1:n
+        # TODO: This will take O(N^2), improve using active_next set
         @einsum D[i,j] = D_prev[i,j]
         
-        active = Tensor(SparseByteMap(Pattern()), n)
         @finch begin
+            active_next .= 0
             for j = _
-                for i = _
-                    if active_prev[i] || active_prev[j]
-                        for k = _
+                for k = _
+                    if active[j] || active[k]
+                        for i = _
                             let d = D_prev[i,k] + D_prev[k,j]
                                 D[i,j] <<min>>= d
-                                active[i] |= d < D_prev[i,j]
-                                active[j] |= d < D_prev[i,j]
+                                active_next[j] |= d < D_prev[i,j]
                             end
                         end
                     end
@@ -34,7 +40,7 @@ function floyd_warshall_adv_einsum(adj_matrix)
         @finch begin
             any_active .= false
             for i = _
-                any_active[] |= active[i]
+                any_active[] |= active_next[i]
             end
         end
         if !any_active[]
@@ -42,7 +48,7 @@ function floyd_warshall_adv_einsum(adj_matrix)
         end
 
         D_prev, D = D, D_prev
-        active_prev, active = active, active_prev
+        active, active_next = active_next, active
     end
 
     return D

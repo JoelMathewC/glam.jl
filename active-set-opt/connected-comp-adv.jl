@@ -1,6 +1,6 @@
 using Finch
 
-function connected_components_einsum(adj_matrix, max_iter)
+function connected_components_adv_einsum(adj_matrix, max_iter)
     (n, _) = size(adj_matrix)
 
     G_prev = Tensor(Dense(SparseList(Element(false))), adj_matrix)
@@ -72,7 +72,7 @@ adj_matrix = [
     0 0 0 0 0 0 0 1
 ]
     
-result = connected_components_einsum(adj_matrix,10)
+result = connected_components_adv_einsum(adj_matrix,10)
 
 for i in 1:size(adj_matrix,1)
     for j in 1:size(adj_matrix,1)

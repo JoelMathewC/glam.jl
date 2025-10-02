@@ -22,3 +22,5 @@ Regarding codegen, note that A, B can be of any dimensions but to verify their i
    1. The active set is whatever is required to identify if A[i] has changed from the previous iteration
 2. if `B[..]` is not constant across iterations
    1. The active is whatever is required to identify if either A[i], B[k] (and so on) has changed across iterations
+
+The only problem at the moment is that it causes non-concordant traversal.

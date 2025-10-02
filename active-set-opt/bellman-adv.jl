@@ -1,4 +1,3 @@
-# Compare against the one in the finch repo when done
 using Finch
 
 function bellman_ford_adv_einsum(adj_matrix,src)

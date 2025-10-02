@@ -1,7 +1,7 @@
 # Compare against the one in the finch repo when done
 using Finch
 
-function bellman_ford_einsum(adj_matrix,src)
+function bellman_ford_adv_einsum(adj_matrix,src)
     G = Tensor(Dense(SparseList(Element(Inf))), adj_matrix)
     (n, _) = size(G)
 
@@ -54,7 +54,7 @@ adj_matrix = [
         Inf Inf 0
     ]
 
-print(bellman_ford_einsum(adj_matrix,1))
+print(bellman_ford_adv_einsum(adj_matrix,1))
 
 # Negative Cycle case
 # adj_matrix = [   

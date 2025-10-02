@@ -1,6 +1,6 @@
 using Finch
 
-function floyd_warshall_einsum(adj_matrix,src)
+function floyd_warshall_einsum(adj_matrix)
     G = Tensor(Dense(SparseList(Element(10^8))), adj_matrix)
     (n, _) = size(G)
 
@@ -23,7 +23,7 @@ adj_matrix = [
         10^8 10^8 0
     ]
 
-print(floyd_warshall_einsum(adj_matrix,1))
+print(floyd_warshall_einsum(adj_matrix))
 
 # Negative Cycle case
 # adj_matrix = [   

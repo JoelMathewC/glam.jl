@@ -17,7 +17,7 @@ We can identify that this optimization can be applied when doing codegen for an 
 @einsum A[..] = A[..] + B[..] + ..
 ```
 
-Regarding codegen, not that A, B can be of any dimensions but to verify their inclusion in the active set we just need their first index
+Regarding codegen, note that A, B can be of any dimensions but to verify their inclusion in the active set we just need their first index
 1. if `B[..]` is constant across iterations
    1. The active set is whatever is required to identify if A[i] has changed from the previous iteration
 2. if `B[..]` is not constant across iterations

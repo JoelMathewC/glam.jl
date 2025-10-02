@@ -7,8 +7,7 @@
 3. Connected Components can be optimized this way
    1. The active set is list of vetrices with true/false values based on whether any one of the ith vertices had G[i,j] change.
 4. Markov cluster expansion step
-5. page rank
-   1. This is very similar to bellman ford, the transition matrix is constant but the page rank is constantly changing
+5. Triangle counting?
 
 ## Identifying applicability
 
@@ -16,6 +15,7 @@ We can identify that this optimization can be applied when doing codegen for an 
 ```
 @einsum A[..] = A[..] + B[..] + ..
 ```
+can this be A <red>= B[] + C[]?
 
 Regarding codegen, note that A, B can be of any dimensions but to verify their inclusion in the active set we just need their first index
 1. if `B[..]` is constant across iterations

@@ -28,7 +28,12 @@ function floydwarshall_bench(mtx_name, fn_list, truth_fn)
             throw("Unidentified function name!")
         end
 
-        is_correct = truth_fn(A) == fw_fn(A)
+        if fn_name == string(nameof(truth_fn))
+            is_correct = true
+        else
+            is_correct = truth_fn(A) == fw_fn(A)
+        end
+
         println("$(nameof(fw_fn)): $time [Correct: $(is_correct)]")
     end
 

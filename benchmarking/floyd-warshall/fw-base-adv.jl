@@ -1,9 +1,13 @@
+# An implementation of Floyd Warshall with two modifications
+#   1. Skip processing of edges (k,i) that have infinite distances between each other
+#   2. Early stop based on whether there is a diff between dists_prev and dists
+
 using Finch
 using MatrixDepot
 using BenchmarkTools
 using SparseArrays
 
-function floydwarshall_finch_kernel(edges)
+function fw_base_adv_finch_kernel(edges)
     (n, m) = size(edges)
     @assert n == m
 
@@ -20,7 +24,6 @@ function floydwarshall_finch_kernel(edges)
     any_active = Scalar(false)
 
     for t in 1:n
-        println("Iteration $t")
         @finch begin
             for j = _
                 for i = _
@@ -62,13 +65,3 @@ function floydwarshall_finch_kernel(edges)
 
     return dists
 end
-
-function floydwarshall_finch(mtx)
-    A = redefault!(Tensor(SparseMatrixCSC{Float64}(mtx)), Inf)
-    time = @belapsed floydwarshall_finch_kernel($A)
-    output = floydwarshall_finch_kernel(A)
-    return (; time = time, mem = Base.summarysize(A), output = output)
-end
-
-res = floydwarshall_finch(matrixdepot("Pajek/EVA"))
-print(res.time)

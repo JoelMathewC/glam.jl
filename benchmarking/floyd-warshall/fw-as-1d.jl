@@ -3,7 +3,7 @@ using MatrixDepot
 using BenchmarkTools
 using SparseArrays
 
-function floydwarshall_finch_kernel(edges)
+function fw_as_1d_finch_kernel(edges)
     (n, m) = size(edges)
     @assert n == m
 
@@ -21,14 +21,11 @@ function floydwarshall_finch_kernel(edges)
     active_next = Tensor(SparseByteMap(Pattern()), n)
     any_active = Scalar(false)
 
-    process_count = Scalar(0)
-
     @finch for i = _ 
         active[i] = true
     end
 
     for t in 1:n
-        println("Starting iteration=$t")
         @finch begin
             for j = _
                 for i = _
@@ -54,7 +51,6 @@ function floydwarshall_finch_kernel(edges)
                 end
             end
         end
-        println("Completed FW step for t=$t")
 
         @finch begin
             any_active .= false
@@ -66,31 +62,9 @@ function floydwarshall_finch_kernel(edges)
             break
         end
 
-        @finch begin
-            process_count .= 0
-            for j = _
-                for k = _
-                    process_count[] += (dists_prev[k, j] < Inf) && (active[j] || active[k])
-                end
-            end
-        end
-
-        println("The active nnz count is $process_count")
-
         dists_prev, dists = dists, dists_prev
         active, active_next = active_next, active
     end
 
     return dists
 end
-
-function floydwarshall_finch(mtx)
-    A = redefault!(Tensor(SparseMatrixCSC{Float64}(mtx)), Inf)
-    time = @belapsed floydwarshall_finch_kernel($A)
-    output = floydwarshall_finch_kernel(A)
-    return (; time = time, mem = Base.summarysize(A), output = output)
-end
-
-
-res = floydwarshall_finch(matrixdepot("Gleich/wb-cs-stanford"))
-print(res.time)
